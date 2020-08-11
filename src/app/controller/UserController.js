@@ -3,16 +3,18 @@ const User = require('../model/User');
 class UserController {
   async index(req, res) {
     try {
-      const user = await User.create({
-        name: 'duane1',
-        username: 'dafaria1',
-        email: 'dwadw1',
-        password: 'dwadw1',
+      const users = await User.findAll({
+        attributes: ['name', 'email', 'username'],
       });
-      return res.json(user);
+      return res.json(users);
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async store(req, res) {
+    const user = await User.create(req.body);
+    return res.json(user);
   }
 }
 
