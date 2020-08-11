@@ -1,4 +1,5 @@
 const express = require('express');
+const Youch = require('youch');
 require('./database');
 
 class App {
@@ -7,6 +8,7 @@ class App {
 
     this.middlewares();
     this.routes();
+    this.handleExceptions();
   }
 
   middlewares() {
@@ -15,6 +17,13 @@ class App {
 
   routes() {
     this.server.use(require('./routes'));
+  }
+
+  handleExceptions() {
+    this.server.use(async (err, req, res, next) => {
+      const errors = await new Youch(err, req).toJSON();
+      return res.status(500).json(errors);
+    });
   }
 }
 

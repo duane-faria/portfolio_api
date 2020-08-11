@@ -1,6 +1,9 @@
 const auth = require('../../config/auth');
+const jwt = require('jsonwebtoken');
+const promisify = require('util').promisify;
+const authConfig = require('../../config/auth');
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -8,6 +11,11 @@ module.exports = (req, res, next) => {
   }
 
   const [, token] = authHeader.split(' ');
-
-  // const { id } =
+  try {
+    const { id } = await promisify(jwt.verify)(token, authConfig.secret);
+    req.userId = id;
+    return next();
+  } catch (e) {
+    return res.status(404).json({ message: 'Token not provided' });
+  }
 };

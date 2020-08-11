@@ -2,14 +2,10 @@ const User = require('../model/User');
 
 class UserController {
   async index(req, res) {
-    try {
-      const users = await User.findAll({
-        attributes: ['name', 'email', 'username'],
-      });
-      return res.json(users);
-    } catch (e) {
-      console.error(e);
-    }
+    const users = await User.findAll({
+      attributes: ['name', 'email', 'username'],
+    });
+    return res.json(users);
   }
 
   async store(req, res) {
