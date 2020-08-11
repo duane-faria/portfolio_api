@@ -1,6 +1,9 @@
 const express = require('express');
 const Youch = require('youch');
+const { resolve } = require('path');
+
 require('./database');
+require('express-async-errors');
 
 class App {
   constructor() {
@@ -13,6 +16,10 @@ class App {
 
   middlewares() {
     this.server.use(express.json());
+    this.server.use(
+      '/files',
+      express.static(resolve(__dirname, '..', 'files', 'uploads'))
+    );
   }
 
   routes() {
