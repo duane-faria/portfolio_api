@@ -1,10 +1,26 @@
 const multer = require('multer');
 const crypto = require('crypto');
 const { extname, resolve } = require('path');
+const fs = require('fs');
 
 module.exports = {
   storage: multer.diskStorage({
-    destination: resolve(__dirname, '..', '..', 'files', 'uploads'),
+    destination: (req, file, cb) => {
+      const dir = resolve(
+        __dirname,
+        '..',
+        '..',
+        'files',
+        'uploads',
+        req.body.id
+      );
+      fs.exists(dir, (exist) => {
+        if (!exist) {
+          return fs.mkdir(dir, (error) => cb(error, dir));
+        }
+        return cb(null, dir);
+      });
+    },
     filename: (req, file, cb) => {
       crypto.randomBytes(16, (err, res) => {
         if (err) cb(err);
