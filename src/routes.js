@@ -9,6 +9,7 @@ const uploads = multer(multerConfig);
 
 routes.post('/user', controllers.UserController.store);
 routes.post('/session', controllers.SessionController.store);
+routes.get('/projects', controllers.ProjectController.index);
 
 routes.use(AuthMiddleware);
 

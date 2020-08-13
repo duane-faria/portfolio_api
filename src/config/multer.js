@@ -6,14 +6,17 @@ const fs = require('fs');
 module.exports = {
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const dir = resolve(
-        __dirname,
-        '..',
-        '..',
-        'files',
-        'uploads',
-        req.body.id
-      );
+      let { name, date } = req.body;
+
+      // date = Date.now();
+      name = name.split(' ').join('');
+
+      const folder = name + '_' + date;
+
+      req.body.folder_name = folder;
+
+      const dir = resolve(__dirname, '..', '..', 'files', 'uploads', folder);
+
       fs.exists(dir, (exist) => {
         if (!exist) {
           return fs.mkdir(dir, (error) => cb(error, dir));

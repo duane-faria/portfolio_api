@@ -10,7 +10,11 @@ class Database {
   init() {
     this.connection = new Sequelize(dbConfig);
     const modelsArr = Object.values(models);
-    modelsArr.map((model) => model.init(this.connection));
+    modelsArr
+      .map((model) => model.init(this.connection))
+      .map(
+        (model) => model.associate && model.associate(this.connection.models)
+      );
   }
 }
 

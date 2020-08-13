@@ -8,6 +8,7 @@ class Projects extends Model {
         name: Sequelize.STRING,
         description: Sequelize.STRING,
         tecnologies: Sequelize.STRING,
+        folder_name: Sequelize.STRING,
         link: Sequelize.STRING,
         date: Sequelize.DATE,
         created_at: Sequelize.DATE,
@@ -16,6 +17,10 @@ class Projects extends Model {
       { sequelize }
     );
     return this;
+  }
+
+  static associate(models) {
+    this.hasMany(models.Files);
   }
 }
 module.exports = Projects;
