@@ -10,6 +10,7 @@ const uploads = multer(multerConfig);
 routes.post('/user', controllers.UserController.store);
 routes.post('/session', controllers.SessionController.store);
 routes.get('/projects', controllers.ProjectController.index);
+routes.get('/tecnologies', controllers.TecnologiesController.index);
 
 routes.use(AuthMiddleware);
 
@@ -19,5 +20,6 @@ routes.post(
   uploads.array('files', 12),
   controllers.ProjectController.store
 );
+routes.post('/tecnologies', controllers.TecnologiesController.store);
 
 module.exports = routes;
