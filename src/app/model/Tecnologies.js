@@ -13,5 +13,11 @@ class Tecnologies extends Model {
     );
     return this;
   }
+  static associate(models) {
+    this.belongsToMany(models.Projects, {
+      through: 'ProjectsTecnologies',
+      foreignKey: 'tecnologie_id',
+    });
+  }
 }
 module.exports = Tecnologies;

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const Model = require('sequelize').Model;
+const { Model } = require('sequelize');
 
 class Projects extends Model {
   static init(sequelize) {
@@ -7,7 +7,6 @@ class Projects extends Model {
       {
         name: Sequelize.STRING,
         description: Sequelize.STRING,
-        tecnologies: Sequelize.STRING,
         folder_name: Sequelize.STRING,
         link: Sequelize.STRING,
         date: Sequelize.DATE,
@@ -21,6 +20,10 @@ class Projects extends Model {
 
   static associate(models) {
     this.hasMany(models.Files);
+    this.belongsToMany(models.Tecnologies, {
+      through: 'ProjectsTecnologies',
+      foreignKey: 'project_id',
+    });
   }
 }
 module.exports = Projects;

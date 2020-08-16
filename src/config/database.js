@@ -5,8 +5,8 @@ module.exports = {
   database: 'portfolio',
   host: 'localhost',
   define: {
-    // timestamps: true,
+    timestamps: true,
     underscored: true,
-    // underscoredAll: true,
+    underscoredAll: true,
   },
 };

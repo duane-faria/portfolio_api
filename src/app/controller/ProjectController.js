@@ -9,16 +9,15 @@ class ProjectController {
           model: models.Files,
           attributes: ['name', 'path'],
         },
+        {
+          model: models.Tecnologies,
+          attributes: ['id', 'name'],
+          through: {
+            attributes: [],
+          },
+        },
       ],
-      attributes: [
-        'id',
-        'name',
-        'description',
-        'tecnologies',
-        'date',
-        'link',
-        'folder_name',
-      ],
+      attributes: ['id', 'name', 'description', 'date', 'link', 'folder_name'],
     });
 
     projects.forEach((project) => {
@@ -29,9 +28,12 @@ class ProjectController {
 
     res.json(projects);
   }
+
   async store(req, res) {
     req.body.date = toDate(Number(req.body.date));
+    let { tecnologies } = req.body;
     const project = await models.Projects.create(req.body);
+
     req.files.forEach(async (file) => {
       let { originalname: name, filename: path } = file;
       await models.Files.create({
@@ -40,9 +42,25 @@ class ProjectController {
         project_id: project.id,
       });
     });
-    return res.json(project);
+
+    tecnologies.forEach(async (tec) => {
+      try {
+        console.log(tec);
+        tec = Number(tec);
+        await models.ProjectsTecnologies.create({
+          project_id: project.id,
+          tecnologie_id: tec,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    return res.json(req.body);
   }
+
   async update() {}
+
   async delete() {}
 }
 
