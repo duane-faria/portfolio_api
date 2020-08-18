@@ -1,0 +1,21 @@
+{
+  "version": 2,
+
+  "name": "portfolio_api",
+
+  "builds": [
+    {
+      "src": "/src/server.js",
+
+      "use": "@now/node-server"
+    }
+  ],
+
+  "routes": [
+    {
+      "src": "/(.*)",
+
+      "dest": "/src/routes.js"
+    }
+  ]
+}
