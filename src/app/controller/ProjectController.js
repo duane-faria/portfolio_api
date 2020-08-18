@@ -20,11 +20,11 @@ class ProjectController {
       attributes: ['id', 'name', 'description', 'date', 'link', 'folder_name'],
     });
 
-    // projects.forEach((project) => {
-    //   project.Files.forEach((file) => {
-    //     file.dataValues.url = `http://localhost:3000/files/${project.folder_name}/${file.path}`;
-    //   });
-    // });
+    projects.forEach((project) => {
+      project.Files.forEach((file) => {
+        file.dataValues.url = `http://localhost:3000/files/${project.folder_name}/${file.path}`;
+      });
+    });
 
     res.json(projects);
   }
