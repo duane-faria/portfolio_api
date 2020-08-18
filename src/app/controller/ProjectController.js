@@ -20,11 +20,11 @@ class ProjectController {
       attributes: ['id', 'name', 'description', 'date', 'link', 'folder_name'],
     });
 
-    projects.forEach((project) => {
-      project.Files.forEach((file) => {
-        file.dataValues.url = `http://localhost:3000/files/${project.folder_name}/${file.path}`;
-      });
-    });
+    // projects.forEach((project) => {
+    //   project.Files.forEach((file) => {
+    //     file.dataValues.url = `http://localhost:3000/files/${project.folder_name}/${file.path}`;
+    //   });
+    // });
 
     res.json(projects);
   }
@@ -43,20 +43,20 @@ class ProjectController {
       });
     });
 
-    tecnologies.forEach(async (tec) => {
-      try {
-        console.log(tec);
-        tec = Number(tec);
-        await models.ProjectsTecnologies.create({
-          project_id: project.id,
-          tecnologie_id: tec,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    });
+    // tecnologies.forEach(async (tec) => {
+    //   try {
+    //     console.log(tec);
+    //     tec = Number(tec);
+    //     await models.ProjectsTecnologies.create({
+    //       project_id: project.id,
+    //       tecnologie_id: tec,
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // });
 
-    return res.json(req.body);
+    return res.json(project);
   }
 
   async update() {}

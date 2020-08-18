@@ -1,3 +1,5 @@
 /node_modules/
 files/uploads/*
+!files/uploads/.gitkeep
 .vscode
+.vercel
