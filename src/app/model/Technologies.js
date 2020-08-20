@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const Model = require('sequelize').Model;
 
-class Tecnologies extends Model {
+class Technologies extends Model {
   static init(sequelize) {
     super.init(
       {
@@ -13,11 +13,12 @@ class Tecnologies extends Model {
     );
     return this;
   }
+
   static associate(models) {
     this.belongsToMany(models.Projects, {
-      through: 'ProjectsTecnologies',
-      foreignKey: 'tecnologie_id',
+      through: 'ProjectsTechnologies',
+      foreignKey: 'technologie_id',
     });
   }
 }
-module.exports = Tecnologies;
+module.exports = Technologies;

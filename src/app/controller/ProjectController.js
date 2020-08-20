@@ -10,7 +10,7 @@ class ProjectController {
           attributes: ['name', 'path'],
         },
         {
-          model: models.Tecnologies,
+          model: models.Technologies,
           attributes: ['id', 'name'],
           through: {
             attributes: [],
@@ -31,7 +31,7 @@ class ProjectController {
 
   async store(req, res) {
     req.body.date = toDate(Number(req.body.date));
-    let { tecnologies } = req.body;
+    let { technologies } = req.body;
     const project = await models.Projects.create(req.body);
 
     req.files.forEach(async (file) => {
@@ -43,11 +43,11 @@ class ProjectController {
       });
     });
 
-    // tecnologies.forEach(async (tec) => {
+    // technologies.forEach(async (tec) => {
     //   try {
     //     console.log(tec);
     //     tec = Number(tec);
-    //     await models.ProjectsTecnologies.create({
+    //     await models.ProjectsTechnologies.create({
     //       project_id: project.id,
     //       tecnologie_id: tec,
     //     });

@@ -1,12 +1,12 @@
 const Sequelize = require('sequelize');
 const { Model } = require('sequelize');
 
-class ProjectsTecnologies extends Model {
+class ProjectsTechnologies extends Model {
   static init(sequelize) {
     super.init(
       {
         project_id: Sequelize.INTEGER,
-        tecnologie_id: Sequelize.INTEGER,
+        technologie_id: Sequelize.INTEGER,
         created_at: Sequelize.DATE,
         updated_at: Sequelize.DATE,
       },
@@ -15,4 +15,4 @@ class ProjectsTecnologies extends Model {
     return this;
   }
 }
-module.exports = ProjectsTecnologies;
+module.exports = ProjectsTechnologies;

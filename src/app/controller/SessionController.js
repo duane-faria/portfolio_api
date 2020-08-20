@@ -29,8 +29,8 @@ class SessionController {
         id,
         name,
         email,
+        token,
       },
-      token,
     });
   }
 }

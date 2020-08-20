@@ -8,7 +8,6 @@ module.exports = {
     destination: (req, file, cb) => {
       let { name, date } = req.body;
 
-      // date = Date.now();
       name = name.split(' ').join('');
 
       const folder = name + '_' + date;
@@ -17,12 +16,12 @@ module.exports = {
 
       const dir = resolve(__dirname, '..', '..', 'files', 'uploads', folder);
 
-      fs.exists(dir, (exist) => {
-        if (!exist) {
-          return fs.mkdir(dir, (error) => cb(error, dir));
-        }
+      if (fs.existsSync(dir)) {
         return cb(null, dir);
-      });
+      }
+
+      fs.mkdirSync(dir);
+      return cb(null, dir);
     },
     filename: (req, file, cb) => {
       crypto.randomBytes(16, (err, res) => {

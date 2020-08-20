@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('projects', 'tecnologies');
+    await queryInterface.removeColumn('projects', 'technologies');
   },
 
   down: async (queryInterface, Sequelize) => {},

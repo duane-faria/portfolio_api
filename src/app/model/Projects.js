@@ -20,8 +20,8 @@ class Projects extends Model {
 
   static associate(models) {
     this.hasMany(models.Files);
-    this.belongsToMany(models.Tecnologies, {
-      through: 'ProjectsTecnologies',
+    this.belongsToMany(models.Technologies, {
+      through: 'ProjectsTechnologies',
       foreignKey: 'project_id',
     });
   }
