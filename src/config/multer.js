@@ -10,7 +10,7 @@ module.exports = {
 
       name = name.split(' ').join('');
 
-      const folder = name + '_' + date;
+      const folder = name.toLowerCase() + '_' + date;
 
       req.body.folder_name = folder;
 
