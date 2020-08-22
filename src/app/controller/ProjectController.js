@@ -1,5 +1,7 @@
 const models = require('../model');
-const { toDate } = require('date-fns');
+const { toDate, format } = require('date-fns');
+const pt = require('date-fns/locale/pt');
+
 class ProjectController {
   async index(req, res) {
     const projects = await models.Projects.findAll({
@@ -23,6 +25,10 @@ class ProjectController {
     projects.forEach((project) => {
       project.Files.forEach((file) => {
         file.dataValues.url = `http://localhost:3000/files/${project.folder_name}/${file.path}`;
+      });
+      project.dataValues.dateClean = project.date;
+      project.dataValues.date = format(project.date, `dd MMM yyyy`, {
+        locale: pt,
       });
     });
 

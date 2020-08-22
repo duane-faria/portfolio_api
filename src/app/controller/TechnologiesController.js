@@ -8,7 +8,6 @@ class Technologies {
 
   async store(req, res) {
     const { name } = req.body;
-
     const TecAlreadyExists = await models.Technologies.findOne({
       where: {
         name,
@@ -24,9 +23,22 @@ class Technologies {
     res.json(tec);
   }
 
-  async update() {}
+  async update(req, res) {
+    const { id, name } = req.body;
+    console.log(req.body);
+    const tec = await models.Technologies.update(req.body, { where: { id } });
+    return res.json(id);
+  }
 
-  async delete() {}
+  async delete(req, res) {
+    const { id } = req.params;
+    const tec = await models.Technologies.destroy({
+      where: {
+        id,
+      },
+    });
+    return res.json(id);
+  }
 }
 
 module.exports = new Technologies();

@@ -21,5 +21,7 @@ routes.post(
   controllers.ProjectController.store
 );
 routes.post('/technologies', controllers.TechnologiesController.store);
+routes.put('/technologies', controllers.TechnologiesController.update);
+routes.delete('/technologies/:id', controllers.TechnologiesController.delete);
 
 module.exports = routes;
