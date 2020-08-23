@@ -17,9 +17,11 @@ module.exports = {
   database: 'sql10361079',
   host: 'sql10.freemysqlhosting.net',
   port: '3306',
+  logging: false,
   define: {
     timestamps: true,
     underscored: true,
     underscoredAll: true,
+    logging: false,
   },
 };
