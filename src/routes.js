@@ -23,5 +23,6 @@ routes.post(
 routes.post('/technologies', controllers.TechnologiesController.store);
 routes.put('/technologies', controllers.TechnologiesController.update);
 routes.delete('/technologies/:id', controllers.TechnologiesController.delete);
+routes.delete('/projects/:id', controllers.ProjectController.delete);
 
 module.exports = routes;

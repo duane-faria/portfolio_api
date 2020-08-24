@@ -1,4 +1,5 @@
 const models = require('../model');
+// const { ProjectsTechnologies } = require('../model');
 const { toDate, format } = require('date-fns');
 const pt = require('date-fns/locale/pt');
 
@@ -53,13 +54,26 @@ class ProjectController {
 
     technologies.forEach(async (tec) => {
       try {
-        // console.log(tec);
-        // tec = Number(tec);
-        // await models.ProjectsTechnologies.create({
-        //   project_id: project.id,
-        //   tecnologie_id: tec,
-        // });
-        await models.Technologies.create({ name: tec });
+        let existsTag = await models.Technologies.findOne({
+          where: {
+            name: tec.toLowerCase(),
+          },
+        });
+
+        if (existsTag) {
+          await models.ProjectsTechnologies.create({
+            project_id: project.id,
+            technologie_id: existsTag.id,
+          });
+          return;
+        }
+
+        let newTag = await models.Technologies.create({ name: tec });
+
+        await models.ProjectsTechnologies.create({
+          project_id: project.id,
+          technologie_id: newTag.id,
+        });
       } catch (e) {
         console.log(e);
       }
