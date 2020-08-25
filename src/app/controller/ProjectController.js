@@ -1,5 +1,4 @@
 const models = require('../model');
-// const { ProjectsTechnologies } = require('../model');
 const { toDate, format } = require('date-fns');
 const pt = require('date-fns/locale/pt');
 
@@ -82,9 +81,15 @@ class ProjectController {
     return res.json(project);
   }
 
-  async update() {}
+  async update(req, res) {}
 
-  async delete() {}
+  async delete(req, res) {
+    const { id } = req.params;
+    models.Files.destroy({ where: { project_id: id } });
+    models.ProjectsTechnologies.destroy({ where: { project_id: id } });
+    models.Projects.destroy({ where: { id } });
+    return res.json(id);
+  }
 }
 
 module.exports = new ProjectController();
