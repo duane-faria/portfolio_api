@@ -20,9 +20,10 @@ routes.post(
   uploads.array('files', 12),
   controllers.ProjectController.store
 );
+routes.put('/projects', controllers.ProjectController.update);
+routes.delete('/projects/:id', controllers.ProjectController.delete);
 routes.post('/technologies', controllers.TechnologiesController.store);
 routes.put('/technologies', controllers.TechnologiesController.update);
 routes.delete('/technologies/:id', controllers.TechnologiesController.delete);
-routes.delete('/projects/:id', controllers.ProjectController.delete);
 
 module.exports = routes;

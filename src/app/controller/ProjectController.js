@@ -50,38 +50,127 @@ class ProjectController {
       }
       await models.Files.create(obj);
     });
+    if (Array.isArray(technologies)) {
+      technologies.forEach(async (tec) => {
+        try {
+          let existsTag = await models.Technologies.findOne({
+            where: {
+              name: tec.toLowerCase(),
+            },
+          });
 
-    technologies.forEach(async (tec) => {
-      try {
-        let existsTag = await models.Technologies.findOne({
-          where: {
-            name: tec.toLowerCase(),
-          },
-        });
+          if (existsTag) {
+            await models.ProjectsTechnologies.create({
+              project_id: project.id,
+              technologie_id: existsTag.id,
+            });
+            return;
+          }
 
-        if (existsTag) {
+          let newTag = await models.Technologies.create({ name: tec });
+
           await models.ProjectsTechnologies.create({
             project_id: project.id,
-            technologie_id: existsTag.id,
+            technologie_id: newTag.id,
           });
-          return;
+        } catch (e) {
+          console.log(e);
         }
+      });
+    } else if (technologies) {
+      let existsTag = await models.Technologies.findOne({
+        where: {
+          name: technologies.toLowerCase(),
+        },
+      });
 
-        let newTag = await models.Technologies.create({ name: tec });
-
+      if (existsTag) {
         await models.ProjectsTechnologies.create({
           project_id: project.id,
-          technologie_id: newTag.id,
+          technologie_id: existsTag.id,
         });
-      } catch (e) {
-        console.log(e);
+        return;
       }
-    });
+
+      let newTag = await models.Technologies.create({ name: technologies });
+
+      await models.ProjectsTechnologies.create({
+        project_id: project.id,
+        technologie_id: newTag.id,
+      });
+    }
 
     return res.json(project);
   }
 
-  async update(req, res) {}
+  async update(req, res) {
+    console.log(req.body);
+    return;
+    req.body.date = toDate(Number(req.body.date));
+    let { technologies, indexFileStar } = req.body;
+    const project = await models.Projects.update(req.body);
+
+    if (req.files) {
+      req.files.forEach(async (file, index) => {
+        let { originalname: name, filename: path } = file;
+        let existsFile = await models.Files.findOne({ where: { path } });
+        let obj = { name, path, project_id: project.id };
+        if (Number(indexFileStar) === index) {
+          obj = { ...obj, star: true };
+        }
+        if (existsFile) {
+          await models.Files.update(obj);
+          return;
+        }
+        await models.Files.create(obj);
+      });
+    }
+
+    // if (!Array.isArray(technologies)) {
+    //   let newTag = await models.Technologies.update({ name: tec });
+    // }
+
+    // technologies.forEach(async (tec) => {
+    //   try {
+    //     let existsTag = await models.Technologies.findOne({
+    //       where: {
+    //         name: tec.toLowerCase(),
+    //       },
+    //     });
+
+    //     if (existsTag) {
+    //       let isCadastred = await models.ProjectController.findOne({
+    //         where: {
+    //           project_id: project.id,
+    //           technologie_id: existsTag.id,
+    //         },
+    //       });
+    //       if (isCadastred) {
+    //         await models.ProjectsTechnologies.create({
+    //           project_id: project.id,
+    //           technologie_id: existsTag.id,
+    //         });
+    //       }
+    //       await models.ProjectsTechnologies.create({
+    //         project_id: project.id,
+    //         technologie_id: existsTag.id,
+    //       });
+    //       return;
+    //     }
+
+    //     let newTag = await models.Technologies.create({ name: tec });
+
+    //     await models.ProjectsTechnologies.create({
+    //       project_id: project.id,
+    //       technologie_id: newTag.id,
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // });
+
+    return res.json(project);
+  }
 
   async delete(req, res) {
     const { id } = req.params;
