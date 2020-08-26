@@ -1,7 +1,8 @@
 const models = require('../model');
 const { toDate, format } = require('date-fns');
 const pt = require('date-fns/locale/pt');
-
+const fs = require('fs');
+const { resolve } = require('path');
 class ProjectController {
   async index(req, res) {
     const projects = await models.Projects.findAll({
@@ -50,6 +51,7 @@ class ProjectController {
       }
       await models.Files.create(obj);
     });
+
     if (Array.isArray(technologies)) {
       technologies.forEach(async (tec) => {
         try {
@@ -105,10 +107,14 @@ class ProjectController {
 
   async update(req, res) {
     console.log(req.body);
-    return;
+    // return;
     req.body.date = toDate(Number(req.body.date));
-    let { technologies, indexFileStar } = req.body;
-    const project = await models.Projects.update(req.body);
+    let { Technologies: technologies, indexFileStar, id } = req.body;
+    const project = await models.Projects.update(req.body, {
+      where: {
+        id,
+      },
+    });
 
     if (req.files) {
       req.files.forEach(async (file, index) => {
@@ -126,54 +132,75 @@ class ProjectController {
       });
     }
 
-    // if (!Array.isArray(technologies)) {
-    //   let newTag = await models.Technologies.update({ name: tec });
-    // }
+    if (!Array.isArray(technologies)) {
+      let newTag = await models.Technologies.update({ name: tec });
+    }
 
-    // technologies.forEach(async (tec) => {
-    //   try {
-    //     let existsTag = await models.Technologies.findOne({
-    //       where: {
-    //         name: tec.toLowerCase(),
-    //       },
-    //     });
+    technologies.forEach(async (tec) => {
+      try {
+        let existsTag = await models.Technologies.findOne({
+          where: {
+            name: tec.text.toLowerCase(),
+          },
+        });
 
-    //     if (existsTag) {
-    //       let isCadastred = await models.ProjectController.findOne({
-    //         where: {
-    //           project_id: project.id,
-    //           technologie_id: existsTag.id,
-    //         },
-    //       });
-    //       if (isCadastred) {
-    //         await models.ProjectsTechnologies.create({
-    //           project_id: project.id,
-    //           technologie_id: existsTag.id,
-    //         });
-    //       }
-    //       await models.ProjectsTechnologies.create({
-    //         project_id: project.id,
-    //         technologie_id: existsTag.id,
-    //       });
-    //       return;
-    //     }
+        if (existsTag) {
+          let isCadastred = await models.ProjectsTechnologies.findOne({
+            where: {
+              project_id: id,
+              technologie_id: existsTag.id,
+            },
+          });
+          if (isCadastred) {
+            // await models.ProjectsTechnologies.create({
+            //   project_id: project.id,
+            //   technologie_id: existsTag.id,
+            // });
+          } else {
+            await models.ProjectsTechnologies.create({
+              project_id: id,
+              technologie_id: existsTag.id,
+            });
+          }
+          return;
+        }
 
-    //     let newTag = await models.Technologies.create({ name: tec });
+        let newTag = await models.Technologies.create({ name: tec.text });
 
-    //     await models.ProjectsTechnologies.create({
-    //       project_id: project.id,
-    //       technologie_id: newTag.id,
-    //     });
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // });
+        await models.ProjectsTechnologies.create({
+          project_id: id,
+          technologie_id: newTag.id,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    });
 
     return res.json(project);
   }
 
   async delete(req, res) {
     const { id } = req.params;
+    const project = await models.Projects.findOne({
+      where: {
+        id,
+      },
+    });
+
+    const dir = resolve(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'files',
+      'uploads',
+      project.folder_name
+    );
+    fs.rmdir(dir, { recursive: true }, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
     models.Files.destroy({ where: { project_id: id } });
     models.ProjectsTechnologies.destroy({ where: { project_id: id } });
     models.Projects.destroy({ where: { id } });
