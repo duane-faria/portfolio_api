@@ -10,7 +10,7 @@ class ProjectController {
       include: [
         {
           model: models.Files,
-          attributes: ['name', 'path'],
+          attributes: ['name', 'path', 'star'],
         },
         {
           model: models.Technologies,
@@ -106,75 +106,87 @@ class ProjectController {
   }
 
   async update(req, res) {
-    console.log(req.body);
-    // return;
     req.body.date = toDate(Number(req.body.date));
-    let { Technologies: technologies, indexFileStar, id } = req.body;
+    let { Technologies: technologies, indexFileStar, id, Files } = req.body;
+    // console.log(req.body);
+    // return;
     const project = await models.Projects.update(req.body, {
       where: {
         id,
       },
     });
 
-    if (req.files) {
-      req.files.forEach(async (file, index) => {
-        let { originalname: name, filename: path } = file;
+    if (Files) {
+      Files.forEach(async (file, index) => {
+        let { name, path } = file;
+
         let existsFile = await models.Files.findOne({ where: { path } });
-        let obj = { name, path, project_id: project.id };
+
+        let obj = { name, path, project_id: id, star: false };
+
         if (Number(indexFileStar) === index) {
-          obj = { ...obj, star: true };
+          obj.star = true;
         }
+
         if (existsFile) {
-          await models.Files.update(obj);
+          console.log(obj);
+          await models.Files.update(obj, {
+            where: {
+              name,
+              path,
+              project_id: id,
+            },
+          });
           return;
         }
+
         await models.Files.create(obj);
       });
     }
 
-    if (!Array.isArray(technologies)) {
-      let newTag = await models.Technologies.update({ name: tec });
-    }
+    // if (!Array.isArray(technologies)) {
+    //   let newTag = await models.Technologies.update({ name: tec });
+    // }
 
-    technologies.forEach(async (tec) => {
-      try {
-        let existsTag = await models.Technologies.findOne({
-          where: {
-            name: tec.text.toLowerCase(),
-          },
-        });
+    // technologies.forEach(async (tec) => {
+    //   try {
+    //     let existsTag = await models.Technologies.findOne({
+    //       where: {
+    //         name: tec.text,
+    //       },
+    //     });
 
-        if (existsTag) {
-          let isCadastred = await models.ProjectsTechnologies.findOne({
-            where: {
-              project_id: id,
-              technologie_id: existsTag.id,
-            },
-          });
-          if (isCadastred) {
-            // await models.ProjectsTechnologies.create({
-            //   project_id: project.id,
-            //   technologie_id: existsTag.id,
-            // });
-          } else {
-            await models.ProjectsTechnologies.create({
-              project_id: id,
-              technologie_id: existsTag.id,
-            });
-          }
-          return;
-        }
+    //     if (existsTag) {
+    //       let isCadastred = await models.ProjectsTechnologies.findOne({
+    //         where: {
+    //           project_id: id,
+    //           technologie_id: existsTag.id,
+    //         },
+    //       });
+    //       if (isCadastred) {
+    //         // await models.ProjectsTechnologies.create({
+    //         //   project_id: project.id,
+    //         //   technologie_id: existsTag.id,
+    //         // });
+    //       } else {
+    //         await models.ProjectsTechnologies.create({
+    //           project_id: id,
+    //           technologie_id: existsTag.id,
+    //         });
+    //       }
+    //       return;
+    //     }
 
-        let newTag = await models.Technologies.create({ name: tec.text });
+    //     let newTag = await models.Technologies.create({ name: tec.text });
 
-        await models.ProjectsTechnologies.create({
-          project_id: id,
-          technologie_id: newTag.id,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    });
+    //     await models.ProjectsTechnologies.create({
+    //       project_id: id,
+    //       technologie_id: newTag.id,
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // });
 
     return res.json(project);
   }
@@ -186,6 +198,10 @@ class ProjectController {
         id,
       },
     });
+
+    if (!project) {
+      return res.json({ error: 'Project does not exists' });
+    }
 
     const dir = resolve(
       __dirname,
