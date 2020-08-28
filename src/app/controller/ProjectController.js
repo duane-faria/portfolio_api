@@ -108,8 +108,7 @@ class ProjectController {
   async update(req, res) {
     req.body.date = toDate(Number(req.body.date));
     let { Technologies: technologies, indexFileStar, id, Files } = req.body;
-    // console.log(req.body);
-    // return;
+
     const project = await models.Projects.update(req.body, {
       where: {
         id,
@@ -129,7 +128,6 @@ class ProjectController {
         }
 
         if (existsFile) {
-          console.log(obj);
           await models.Files.update(obj, {
             where: {
               name,
@@ -147,46 +145,62 @@ class ProjectController {
     // if (!Array.isArray(technologies)) {
     //   let newTag = await models.Technologies.update({ name: tec });
     // }
+    let tagsAlreadyInserted = await models.ProjectsTechnologies.findAll({
+      where: {
+        project_id: id,
+      },
+    });
 
-    // technologies.forEach(async (tec) => {
-    //   try {
-    //     let existsTag = await models.Technologies.findOne({
-    //       where: {
-    //         name: tec.text,
-    //       },
-    //     });
+    let tagOk = false;
 
-    //     if (existsTag) {
-    //       let isCadastred = await models.ProjectsTechnologies.findOne({
-    //         where: {
-    //           project_id: id,
-    //           technologie_id: existsTag.id,
-    //         },
-    //       });
-    //       if (isCadastred) {
-    //         // await models.ProjectsTechnologies.create({
-    //         //   project_id: project.id,
-    //         //   technologie_id: existsTag.id,
-    //         // });
-    //       } else {
-    //         await models.ProjectsTechnologies.create({
-    //           project_id: id,
-    //           technologie_id: existsTag.id,
-    //         });
-    //       }
-    //       return;
-    //     }
+    tagsAlreadyInserted.forEach((tagAlIns) => {
+      technologies.forEach((newTags) => {
+        if (tagAlIns.technologie_id === Number(newTags.id)) {
+          tagOk = true;
+        }
+      });
+      if (!tagOk) {
+        models.ProjectsTechnologies.destroy({
+          where: { technologie_id: tagAlIns.technologie_id, project_id: id },
+        });
+      }
+      tagOk = false;
+    });
 
-    //     let newTag = await models.Technologies.create({ name: tec.text });
+    technologies.forEach(async (tec) => {
+      try {
+        let existsTag = await models.Technologies.findOne({
+          where: {
+            name: tec.text,
+          },
+        });
 
-    //     await models.ProjectsTechnologies.create({
-    //       project_id: id,
-    //       technologie_id: newTag.id,
-    //     });
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // });
+        if (existsTag) {
+          let isCadastred = await models.ProjectsTechnologies.findOne({
+            where: {
+              project_id: id,
+              technologie_id: existsTag.id,
+            },
+          });
+          if (!isCadastred) {
+            await models.ProjectsTechnologies.create({
+              project_id: id,
+              technologie_id: existsTag.id,
+            });
+          }
+          return;
+        }
+
+        let newTag = await models.Technologies.create({ name: tec.text });
+
+        await models.ProjectsTechnologies.create({
+          project_id: id,
+          technologie_id: newTag.id,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    });
 
     return res.json(project);
   }
@@ -212,11 +226,13 @@ class ProjectController {
       'uploads',
       project.folder_name
     );
+
     fs.rmdir(dir, { recursive: true }, (err) => {
       if (err) {
         throw err;
       }
     });
+
     models.Files.destroy({ where: { project_id: id } });
     models.ProjectsTechnologies.destroy({ where: { project_id: id } });
     models.Projects.destroy({ where: { id } });
