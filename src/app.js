@@ -1,3 +1,4 @@
+process.env.PWD = process.cwd();
 const express = require('express');
 require('dotenv/config');
 const Youch = require('youch');
@@ -27,7 +28,7 @@ class App {
     
     this.server.use(
       '/files',
-      express.static(resolve(process.cwd(), '..', 'files', 'uploads'))
+      express.static(resolve(process.env.PWD, '..', 'files', 'uploads'))
     );
   }
 
