@@ -1,3 +1,4 @@
+require('dotenv').config();
 // module.exports = {
 //   dialect: 'mysql',
 //   username: 'root',
@@ -10,12 +11,13 @@
 //     underscoredAll: true,
 //   },
 // };
+
 module.exports = {
   dialect: 'mysql',
-  username: 'sql10361079',
-  password: 'cslzlxkQXu',
-  database: 'sql10361079',
-  host: 'sql10.freemysqlhosting.net',
+  username: process.env.DB_USER,
+  password:  process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  host:  process.env.DB_HOST,
   port: '3306',
   logging: false,
   define: {

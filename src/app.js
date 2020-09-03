@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv/config');
 const Youch = require('youch');
 const { resolve } = require('path');
 const Sentry = require('@sentry/node');
@@ -11,7 +12,7 @@ class App {
     this.server = express();
     Sentry.init({
       dsn:
-        'https://4551711d4daf4ad8987606cf959e116d@o432232.ingest.sentry.io/5395840',
+        process.env.SENTRY_DSN,
     });
     this.middlewares();
     this.routes();
@@ -36,9 +37,12 @@ class App {
 
   handleExceptions() {
     this.server.use(async (err, req, res, next) => {
-      const errors = await new Youch(err, req).toJSON();
-      console.log(errors);
-      return res.status(500).json(errors);
+      if(process.env.NODE_ENV==='development'){
+        const errors = await new Youch(err, req).toJSON();
+        return res.status(500).json(errors);
+      }
+      return res.status(500).json({error:'Internal server error'});
+
     });
   }
 }

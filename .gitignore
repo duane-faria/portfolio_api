@@ -3,3 +3,4 @@ files/uploads/*
 !files/uploads/.gitkeep
 .vscode
 .vercel
+.env
