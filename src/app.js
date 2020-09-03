@@ -2,7 +2,7 @@ process.env.PWD = process.cwd();
 const express = require('express');
 require('dotenv/config');
 const Youch = require('youch');
-const { resolve,normalize } = require('path');
+const { resolve,normalize,join } = require('path');
 const Sentry = require('@sentry/node');
 const cors = require('cors');
 require('./database');
@@ -28,7 +28,7 @@ class App {
     
     this.server.use(
       '/files',
-      express.static(resolve(process.env.PWD, '..', 'files', 'uploads'))
+      express.static(join(__dirname ,'..', 'files', 'uploads'))
     );
   }
 
