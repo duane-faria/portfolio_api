@@ -2,8 +2,15 @@ const models = require('../model');
 
 class Technologies {
   async index(req, res) {
-    const tec = await models.Technologies.findAll();
-    res.json(tec);
+    const { page = 1 } = req.query;
+    const tec = await models.Technologies.findAll({
+      order: [['created_at', 'DESC']],
+      limit: 5,
+      offset: (page - 1) * 5,
+    });
+    const total = await models.Technologies.count();
+    const obj = { ...tec, info: { total, limit: 5, page } };
+    res.json(obj);
   }
 
   async store(req, res) {
