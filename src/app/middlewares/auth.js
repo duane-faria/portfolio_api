@@ -17,6 +17,6 @@ module.exports = async (req, res, next) => {
     req.userId = id;
     return next();
   } catch (e) {
-    return res.status(404).json({ message: 'Token not provided',catch:true });
+    return res.status(404).json({ message: 'Token invalid',catch:true });
   }
 };
