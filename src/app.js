@@ -27,7 +27,7 @@ class App {
     
     this.server.use(
       '/files',
-      express.static(normalize(resolve(__dirname, '..', 'files', 'uploads')),{ maxAge: 86400000 })
+      express.static(resolve(process.cwd(), '..', 'files', 'uploads'))
     );
   }
 
