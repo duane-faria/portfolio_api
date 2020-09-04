@@ -4,8 +4,6 @@ const controllers = require('./app/controller');
 const AuthMiddleware = require('./app/middlewares/auth');
 const multerConfig = require('./config/multer');
 const routes = new Router();
-const express = require('express');
-const { resolve,normalize,join } = require('path');
 
 const uploads = multer(multerConfig);
 
@@ -13,11 +11,8 @@ routes.post('/user', controllers.UserController.store);
 routes.post('/session', controllers.SessionController.store);
 routes.get('/projects', controllers.ProjectController.index);
 routes.get('/technologies', controllers.TechnologiesController.index);
-routes.use(
-  '/files',
-  express.static(join(__dirname ,'..', 'files', 'uploads'))
-);
-routes.use(AuthMiddleware);
+
+// routes.use(AuthMiddleware);
 
 routes.get('/user', controllers.UserController.index);
 routes.post(
