@@ -28,10 +28,6 @@ class App {
       '/files',
       express.static(resolve(__dirname, '..', 'public', 'uploads'))
     );
-    // this.server.use(
-    //   '/files',
-    //   express.static(resolve(__dirname, '..', 'files', 'uploads'))
-    // );
   }
 
   routes() {
