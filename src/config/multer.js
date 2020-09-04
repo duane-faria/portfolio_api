@@ -14,7 +14,7 @@ module.exports = {
 
       req.body.folder_name = folder;
 
-      const dir = resolve(__dirname, '..', '..', 'files', 'uploads', folder);
+      const dir = resolve(__dirname, '..', '..', 'public', 'uploads', folder);
 
       if (fs.existsSync(dir)) {
         return cb(null, dir);
