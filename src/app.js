@@ -25,13 +25,13 @@ class App {
     this.server.use(express.json());
     this.server.use(cors());
     this.server.use(
-      '/public',
+      '/files',
       express.static(resolve(__dirname, '..', 'public'))
     );
-    this.server.use(
-      '/files',
-      express.static(resolve(__dirname, '..', 'files', 'uploads'))
-    );
+    // this.server.use(
+    //   '/files',
+    //   express.static(resolve(__dirname, '..', 'files', 'uploads'))
+    // );
   }
 
   routes() {
