@@ -25,7 +25,7 @@ class ProjectController {
     if (projects.length > 0) {
       projects.forEach((project) => {
         project.Files.forEach((file) => {
-          file.dataValues.url = `${process.env.APP_URL}/files/${project.folder_name}/${file.path}`;
+          file.dataValues.url = `${process.env.APP_URL}/files/uploads/${project.folder_name}/${file.path}`;
         });
         project.dataValues.dateClean = project.date;
         project.dataValues.date = format(project.date, `dd MMM yyyy`, {
