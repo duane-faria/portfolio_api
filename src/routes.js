@@ -12,7 +12,7 @@ routes.post('/session', controllers.SessionController.store);
 routes.get('/projects', controllers.ProjectController.index);
 routes.get('/technologies', controllers.TechnologiesController.index);
 
-routes.use(AuthMiddleware);
+// routes.use(AuthMiddleware);
 
 routes.get('/user', controllers.UserController.index);
 routes.post(
