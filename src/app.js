@@ -26,7 +26,7 @@ class App {
     this.server.use(cors());
     this.server.use(
       '/files',
-      express.static(resolve(__dirname, '..', 'public', 'uploads'))
+      express.static(resolve(__dirname, '..', 'public'))
     );
   }
 
