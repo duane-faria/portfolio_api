@@ -10,7 +10,7 @@ class ProjectController {
       include: [
         {
           model: models.Files,
-          attributes: ['name', 'path', 'star'],
+          attributes: ['name', 'path', 'url', 'star'],
         },
         {
           model: models.Technologies,
@@ -23,15 +23,15 @@ class ProjectController {
       attributes: ['id', 'name', 'description', 'date', 'link', 'folder_name'],
     });
     if (projects.length > 0) {
-      projects.forEach((project) => {
-        project.Files.forEach((file) => {
-          file.dataValues.url = `${process.env.APP_URL}/files/uploads/${project.folder_name}/${file.path}`;
-        });
-        project.dataValues.dateClean = project.date;
-        project.dataValues.date = format(project.date, `dd MMM yyyy`, {
-          locale: pt,
-        });
-      });
+      // projects.forEach((project) => {
+      //   project.Files.forEach((file) => {
+      //     file.dataValues.url = `${process.env.APP_URL}/files/uploads/${project.folder_name}/${file.path}`;
+      //   });
+      //   project.dataValues.dateClean = project.date;
+      //   project.dataValues.date = format(project.date, `dd MMM yyyy`, {
+      //     locale: pt,
+      //   });
+      // });
     }
 
     res.json(projects);
@@ -43,9 +43,9 @@ class ProjectController {
     const project = await models.Projects.create(req.body);
 
     req.files.forEach(async (file, index) => {
-      let { originalname: name, filename: path } = file;
+      let { originalname: name, key: path, location: url = '' } = file;
 
-      let obj = { name, path, project_id: project.id };
+      let obj = { name, path, project_id: project.id, url };
       if (Number(indexFileStar) === index) {
         obj = { ...obj, star: true };
       }

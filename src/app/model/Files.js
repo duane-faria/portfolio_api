@@ -7,6 +7,7 @@ class Files extends Model {
       {
         name: Sequelize.STRING,
         path: Sequelize.STRING,
+        url: Sequelize.STRING,
         star: Sequelize.BOOLEAN,
         project_id: Sequelize.INTEGER,
         created_at: Sequelize.DATE,
