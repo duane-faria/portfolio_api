@@ -1,9 +1,8 @@
 const models = require('../model');
 const { toDate, format } = require('date-fns');
 const pt = require('date-fns/locale/pt');
-const fs = require('fs');
-const { resolve } = require('path');
 class ProjectController {
+  constructor() {}
   async index(req, res) {
     const projects = await models.Projects.findAll({
       order: ['date'],
@@ -22,17 +21,6 @@ class ProjectController {
       ],
       attributes: ['id', 'name', 'description', 'date', 'link', 'folder_name'],
     });
-    if (projects.length > 0) {
-      // projects.forEach((project) => {
-      //   project.Files.forEach((file) => {
-      //     file.dataValues.url = `${process.env.APP_URL}/files/uploads/${project.folder_name}/${file.path}`;
-      //   });
-      //   project.dataValues.dateClean = project.date;
-      //   project.dataValues.date = format(project.date, `dd MMM yyyy`, {
-      //     locale: pt,
-      //   });
-      // });
-    }
 
     res.json(projects);
   }
@@ -217,25 +205,13 @@ class ProjectController {
       return res.json({ error: 'Project does not exists' });
     }
 
-    const dir = resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'files',
-      'uploads',
-      project.folder_name
-    );
-
-    fs.rmdir(dir, { recursive: true }, (err) => {
-      if (err) {
-        throw err;
-      }
+    await models.Files.destroy({
+      where: { project_id: id },
+      individualHooks: true,
     });
+    await models.ProjectsTechnologies.destroy({ where: { project_id: id } });
+    await models.Projects.destroy({ where: { id } });
 
-    models.Files.destroy({ where: { project_id: id } });
-    models.ProjectsTechnologies.destroy({ where: { project_id: id } });
-    models.Projects.destroy({ where: { id } });
     return res.json(id);
   }
 }
