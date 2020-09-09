@@ -20,12 +20,6 @@ class Files extends Model {
       {
         hooks: {
           beforeDestroy: (file, options) => {
-            console.log('before destroy');
-            // await s3.deleteObject({
-            //   Bucket: 'dfportfolio2',
-            //   Key: file.path,
-            // }).promise;
-
             s3.deleteObject(
               {
                 Bucket: 'dfportfolio2',

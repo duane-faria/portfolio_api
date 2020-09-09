@@ -25,5 +25,10 @@ routes.delete('/projects/:id', controllers.ProjectController.delete);
 routes.post('/technologies', controllers.TechnologiesController.store);
 routes.put('/technologies', controllers.TechnologiesController.update);
 routes.delete('/technologies/:id', controllers.TechnologiesController.delete);
+routes.post(
+  '/files',
+  uploads.array('files', 12),
+  controllers.FilesController.store
+);
 
 module.exports = routes;
