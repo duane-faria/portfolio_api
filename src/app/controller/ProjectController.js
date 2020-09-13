@@ -5,10 +5,11 @@ class ProjectController {
   constructor() {}
   async index(req, res) {
     const projects = await models.Projects.findAll({
-      order: ['date'],
+      order: [['id', 'DESC']],
       include: [
         {
           model: models.Files,
+          // as: 'files',
           attributes: ['name', 'path', 'url', 'star'],
         },
         {
@@ -19,13 +20,22 @@ class ProjectController {
           },
         },
       ],
-      attributes: ['id', 'name', 'description', 'date', 'link', 'folder_name'],
+      attributes: [
+        'id',
+        'name',
+        'description',
+        'date',
+        'link',
+        'repository',
+        'folder_name',
+      ],
     });
 
     res.json(projects);
   }
 
   async store(req, res) {
+    // console.log(req.body);
     req.body.date = toDate(Number(req.body.date));
     let { technologies, indexFileStar } = req.body;
     const project = await models.Projects.create(req.body);
@@ -106,10 +116,11 @@ class ProjectController {
         description,
         link,
         name,
+        repository,
       } = req.body;
 
       const project = await models.Projects.update(
-        { name, description, link, date },
+        { name, description, link, repository, date },
         {
           where: {
             id,
@@ -117,33 +128,53 @@ class ProjectController {
         }
       );
 
+      if (Files) {
+        Files.forEach(async (file, index) => {
+          let { path, name } = file;
+
+          let variable = { star: false };
+          if (Number(indexFileStar) === index) {
+            variable.star = true;
+          }
+          await models.Files.update(variable, {
+            where: {
+              name,
+              path,
+              project_id: id,
+            },
+          });
+        });
+      }
+
       if (filesUpload) {
         filesUpload.forEach(async (file, index) => {
           let { key: path, location: url, originalname: name } = file;
 
-          // let existsFile = await models.Files.findOne({ where: { path } });
+          let existsFile = await models.Files.findOne({ where: { name, url } });
 
           let obj = { name, path, project_id: id, url, star: false };
-          // if (Number(indexFileStar) === index) {
-          //   obj.star = true;
-          // }
-
-          // if (existsFile) {
-          //   await models.Files.update(obj, {
-          //     where: {
-          //       name,
-          //       path,
-          //       project_id: id,
-          //     },
-          //   });
-          //   return;
-          // }
+          if (Number(indexFileStar) === index) {
+            obj.star = true;
+          }
+          if (existsFile) {
+            let variable = { star: false };
+            if (Number(indexFileStar) === index) {
+              variable.star = true;
+            }
+            await models.Files.update(variable, {
+              where: {
+                name,
+                path,
+                project_id: id,
+              },
+            });
+            return;
+          }
 
           await models.Files.create(obj);
         });
       }
 
-      console.log(technologies);
       if (technologies) {
         let tagsAlreadyInserted = await models.ProjectsTechnologies.findAll({
           where: {

@@ -9,6 +9,7 @@ class Projects extends Model {
         description: Sequelize.STRING,
         folder_name: Sequelize.STRING,
         link: Sequelize.STRING,
+        repository: Sequelize.STRING,
         date: Sequelize.DATE,
         created_at: Sequelize.DATE,
         updated_at: Sequelize.DATE,
