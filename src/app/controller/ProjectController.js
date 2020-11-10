@@ -132,6 +132,29 @@ class ProjectController {
         }
       );
       if (Files) {
+        const registeredFiles = await models.Files.findAll({
+          where: {
+            project_id: id,
+          },
+        });
+        let deleteFile = true;
+        registeredFiles.forEach(async (rf) => {
+          Files.forEach((cf) => {
+            if (rf.path == cf.path) {
+              deleteFile = false;
+            }
+          });
+          if (deleteFile) {
+            await models.Files.destroy({
+              where: {
+                path: rf.path,
+                project_id: id,
+              },
+            });
+          }
+          deleteFile = true;
+        });
+
         Files.forEach(async (file, index) => {
           let { path, name } = file;
 
