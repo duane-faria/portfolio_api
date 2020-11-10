@@ -5,11 +5,10 @@ class ProjectController {
   constructor() {}
   async index(req, res) {
     const projects = await models.Projects.findAll({
-      order: [['id', 'DESC']],
+      order: [['position', 'ASC']],
       include: [
         {
           model: models.Files,
-          // as: 'files',
           attributes: ['name', 'path', 'url', 'star'],
         },
         {
@@ -27,85 +26,89 @@ class ProjectController {
         'date',
         'link',
         'repository',
-        'folder_name',
+        'position',
       ],
     });
 
-    res.json(projects);
+    return res.json(projects);
   }
 
   async store(req, res) {
-    // console.log(req.body);
-    req.body.date = toDate(Number(req.body.date));
-    let { technologies, indexFileStar } = req.body;
-    const project = await models.Projects.create(req.body);
+    try {
+      req.body.date = toDate(Number(req.body.date));
+      req.body.position = Number(await models.Projects.max('position')) + 1;
 
-    req.files.forEach(async (file, index) => {
-      let { originalname: name, key: path, location: url = '' } = file;
+      let { technologies, indexFileStar } = req.body;
 
-      let obj = { name, path, project_id: project.id, url };
-      if (Number(indexFileStar) === index) {
-        obj = { ...obj, star: true };
-      }
-      await models.Files.create(obj);
-    });
+      const project = await models.Projects.create(req.body);
 
-    if (Array.isArray(technologies)) {
-      technologies.forEach(async (tec) => {
-        try {
-          let existsTag = await models.Technologies.findOne({
-            where: {
-              name: tec.toLowerCase(),
-            },
-          });
+      req.files.forEach(async (file, index) => {
+        let { originalname: name, key: path, location: url = '' } = file;
 
-          if (existsTag) {
+        let obj = { name, path, project_id: project.id, url };
+        if (Number(indexFileStar) === index) {
+          obj = { ...obj, star: true };
+        }
+        await models.Files.create(obj);
+      });
+
+      if (Array.isArray(technologies)) {
+        technologies.forEach(async (tec) => {
+          try {
+            let existsTag = await models.Technologies.findOne({
+              where: {
+                name: tec.toLowerCase(),
+              },
+            });
+
+            if (existsTag) {
+              await models.ProjectsTechnologies.create({
+                project_id: project.id,
+                technologie_id: existsTag.id,
+              });
+              return;
+            }
+
+            let newTag = await models.Technologies.create({ name: tec });
+
             await models.ProjectsTechnologies.create({
               project_id: project.id,
-              technologie_id: existsTag.id,
+              technologie_id: newTag.id,
             });
-            return;
+          } catch (e) {
+            console.log(e);
           }
-
-          let newTag = await models.Technologies.create({ name: tec });
+        });
+      } else if (technologies) {
+        let existsTag = await models.Technologies.findOne({
+          where: {
+            name: technologies.toLowerCase(),
+          },
+        });
+        if (existsTag) {
+          await models.ProjectsTechnologies.create({
+            project_id: project.id,
+            technologie_id: existsTag.id,
+          });
+        } else {
+          let newTag = await models.Technologies.create({ name: technologies });
 
           await models.ProjectsTechnologies.create({
             project_id: project.id,
             technologie_id: newTag.id,
           });
-        } catch (e) {
-          console.log(e);
         }
-      });
-    } else if (technologies) {
-      let existsTag = await models.Technologies.findOne({
-        where: {
-          name: technologies.toLowerCase(),
-        },
-      });
-
-      if (existsTag) {
-        await models.ProjectsTechnologies.create({
-          project_id: project.id,
-          technologie_id: existsTag.id,
-        });
-        return;
       }
-
-      let newTag = await models.Technologies.create({ name: technologies });
-
-      await models.ProjectsTechnologies.create({
-        project_id: project.id,
-        technologie_id: newTag.id,
-      });
+      return res.json(project);
+    } catch (e) {
+      console.log(e);
+      res.json({ error: 'error' });
     }
-
-    return res.json(project);
   }
 
   async update(req, res) {
     try {
-      req.body.date = toDate(Number(req.body.date));
+      if (req.body.date) req.body.date = toDate(Number(req.body.date));
       let {
         Technologies: technologies,
         indexFileStar,
@@ -117,17 +120,17 @@ class ProjectController {
         link,
         name,
         repository,
+        position,
       } = req.body;
 
       const project = await models.Projects.update(
-        { name, description, link, repository, date },
+        { name, description, link, repository, date, position },
         {
           where: {
             id,
           },
         }
       );
-
       if (Files) {
         Files.forEach(async (file, index) => {
           let { path, name } = file;
@@ -232,7 +235,7 @@ class ProjectController {
           });
         });
       }
-      return res.json(project);
+      return res.json({ status: 'ok' });
     } catch (e) {
       console.log(e);
     }
